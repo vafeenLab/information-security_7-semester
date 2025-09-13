@@ -17,6 +17,13 @@ fun Array<CharArray>.toMatrixString(): String {
 }
 
 /**
+ * Преобразует строку ключей, разделённых пробелами, в список целых чисел.
+ * @receiver Исходная строка с ключами.
+ * @return Список ключей в виде Int.
+ */
+fun String.readKeys(): List<Int> = split(" ").map { it.toInt() }
+
+/**
  * Класс, реализующий шифрование и дешифрование текста с помощью ключей для строк и колонок.
  * @property keysForRow Список ключей для перестановки символов по строкам.
  * @property keysForColumn Список ключей для перестановки символов по столбцам.
@@ -40,7 +47,7 @@ internal class MatrixCryptographer(
      * @param matrix Матрица для декодирования.
      * @return Раскодированная матрица символов.
      */
-    fun decode(matrix: Matrix) =
+    fun decode(matrix: Matrix): Matrix =
         matrix
             .transpose()
             .decodeRows()
@@ -88,7 +95,6 @@ internal class MatrixCryptographer(
             currentMatrixStr.indices.forEach { j ->
                 matrix[i][j] = str[i * currentMatrixStr.size + j]
             }
-            println(currentMatrixStr)
         }
         return matrix
     }

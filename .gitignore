@@ -5,7 +5,7 @@ build/
 !**/src/test/**/build/
 
 local.properties
-
+.~lock.*
 ### IntelliJ IDEA ###
 .idea/
 *.iws
