@@ -1,48 +1,40 @@
 package lab2
 
-import jdk.internal.org.jline.keymap.KeyMap.key
-
-
 private typealias Matrix = Array<CharArray>
 
 /**
- * Преобразует матрицу символов в строковое представление с рамкой из дефисов.
- * @receiver Исходная матрица символов.
- * @return Строка с отображением матрицы.
+ * Класс для шифрования текста с помощью шифра Виженера.
+ * @property key Ключевое слово для шифрования.
  */
-fun Array<CharArray>.toMatrixString(): String {
-    val sizeOfBorder = 20
-
-    return "-".repeat(sizeOfBorder) +
-            "\n" +
-            this.joinToString(separator = "\n") { it.joinToString(separator = " ") } + "\n" +
-            "-".repeat(sizeOfBorder) + "\n"
-}
-
-/**
- * Создаёт глубокую копию матрицы символов.
- * @receiver Исходная матрица.
- * @return Новая матрица с копиями всех строк.
- */
-fun Matrix.deepClone(): Matrix {
-    return Array(size) { index -> this[index].copyOf() }
-}
-
 internal class Wigener(private val key: String) {
     private val symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    /**
+     * Циклически сдвигает строку влево на n символов.
+     * @receiver Исходная строка.
+     * @param n Количество символов для сдвига.
+     * @return Новая строка после сдвига.
+     */
     fun String.shiftLeft(n: Int): String {
         val shift = n % length
         return this.substring(shift) + this.substring(0, shift)
     }
 
+    // Создаёт матрицу Виженера (таблицу сдвигов)
     private val matrix = createMatrix()
 
     private fun createMatrix(): Matrix = Array(symbols.length) { index ->
         symbols
             .shiftLeft(index)
             .toCharArray()
-    }.also { println(it.toMatrixString()) }
+    }//.also { println(it.toMatrixString()) }
 
+    /**
+     * Получает индекс символа в алфавите symbols.
+     * @receiver Символ для поиска индекса.
+     * @return Индекс символа в алфавите.
+     * @throws Exception Если символ не найден.
+     */
     fun Char.indexOfSymbol(): Int {
         var result: Int? = null
         symbols.forEachIndexed { index, char ->
@@ -51,7 +43,13 @@ internal class Wigener(private val key: String) {
         return result ?: throw Exception("Index is not found")
     }
 
+    /**
+     * Кодирует входящую строку с помощью шифра Виженера и ключа.
+     * @param str Входящая строка для шифрования.
+     * @return Закодированная строка.
+     */
     fun encode(str: String): String {
+        // Повторяем ключ, чтобы длина совпадала с длиной строки
         val repeatedKey = key.repeat(str.length / key.length + 1).substring(0, str.length)
         val result = repeatedKey.toCharArray()
         0.rangeUntil(str.length).forEach { index ->
