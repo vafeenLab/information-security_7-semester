@@ -1,103 +1,103 @@
 package lab3
 
-import java.lang.Math.pow
-import kotlin.math.pow
-import kotlin.properties.Delegates
-import kotlin.text.forEach
-
 internal class RSA(
-    private val p: Int,
-    private val q: Int
+    private val p: Long,
+    private val q: Long
 ) {
     private val symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-    /**
-     * Получает индекс символа в алфавите symbols.
-     * @receiver Символ для поиска индекса.
-     * @return Индекс символа в алфавите.
-     * @throws Exception Если символ не найден.
-     */
+    private val n: Long = p * q
+    private val phi: Long = (p - 1) * (q - 1)
+    private val e: Long = findRelativelyPrime(phi)
+    private val d: Long = modInverse(e, phi)
+
     private fun Char.indexOfSymbol(): Int {
-        var result: Int? = null
-        symbols.forEachIndexed { index, char ->
-            if (char == this) result = index
-        }
-        return result ?: throw Exception("Index is not found")
+        val index = symbols.indexOf(this)
+        if (index == -1) throw Exception("Symbol $this not found in alphabet")
+        return index
     }
 
-
-    private fun gcd(mInitial: Int, nInitial: Int): Int {
-        var m = mInitial
-        var n = nInitial
-        while (m != n) {
-            if (m > n)
-                m = m - n
-            else n = n - m
+    // Нахождение взаимно простого числа с phi (наименьший кандидат > 1)
+    private fun findRelativelyPrime(phi: Long): Long {
+        var candidate = 2L
+        while (candidate < phi) {
+            if (gcd(candidate, phi) == 1L) return candidate
+            candidate++
         }
-        return n
+        throw Exception("Cannot find relatively prime number")
     }
 
-    private fun phi(n: Int) = (p - 1) * (q - 1)
+    private fun gcd(a: Long, b: Long): Long {
+        var x = a
+        var y = b
+        while (y != 0L) {
+            val temp = y
+            y = x % y
+            x = temp
+        }
+        return x
+    }
 
-    private fun relativelyPrimeNumber(number: Int): Int {
-        var currentNumber = 1
-        var result = -1
-        while (currentNumber < number) {
-            if (gcd(currentNumber, number) == 1)
-                result = currentNumber
-            currentNumber += 1
+    // Быстрое возведение в степень по модулю
+    private fun modPow(base: Long, exponent: Long, modulus: Long): Long {
+        var result = 1L
+        var b = base % modulus
+        var e = exponent
+        while (e > 0) {
+            if (e and 1L == 1L) {
+                result = (result * b) % modulus
+            }
+            e = e shr 1
+            b = (b * b) % modulus
         }
         return result
     }
 
-    private var n by Delegates.notNull<Int>()
-    private var phi by Delegates.notNull<Int>()
-    private var e by Delegates.notNull<Int>()
-    private var d by Delegates.notNull<Int>()
-    private var publicKeys by Delegates.notNull<Pair<Int, Int>>()
-    private var privateKeys by Delegates.notNull<Pair<Int, Int>>()
-    private fun d(): Int = (e.toDouble().pow(-1) % phi).toInt()
+    // Расширенный алгоритм Евклида для вычисления modular inverse
+    private fun modInverse(a: Long, m: Long): Long {
+        val m0 = m
+        var y = 0L
+        var x = 1L
+        var aa = a
+        var mm = m
 
-    private fun evaluateParts() {
-        n = p * q
-        phi = phi(n)
-        e = relativelyPrimeNumber(phi)
-        d = d()
-        publicKeys = e to n
-        privateKeys = d to n
+        if (m == 1L) return 0
+
+        while (aa > 1) {
+            val q = aa / mm
+            var t = mm
+
+            mm = aa % mm
+            aa = t
+            t = y
+
+            y = x - q * y
+            x = t
+        }
+        if (x < 0) x += m0
+        return x
+    }
+
+    fun encode(message: String): List<Long> {
+        return message.map { ch ->
+            val m = ch.indexOfSymbol().toLong()
+            modPow(m, e, n)
+        }
+    }
+
+    fun decode(encoded: List<Long>): String {
+        return encoded.map { c ->
+            val m = modPow(c, d, n).toInt()
+            symbols[m]
+        }.joinToString("")
     }
 
     fun printParams() {
+        println("p = $p")
+        println("q = $q")
         println("n = $n")
         println("phi = $phi")
         println("e = $e")
         println("d = $d")
-        println("publicKeys = $publicKeys")
-        println("privateKeys = $privateKeys")
-    }
-
-
-    private fun Int.applyKeys(keys: Pair<Int, Int>): Int =
-        (this.toDouble()
-            .pow(keys.first.toDouble()) % keys.second).toInt()
-
-    private fun CharArray.applyKeysForMessage(keys: Pair<Int, Int>): String {
-        var result = ""
-        this.forEach { ch ->
-            val index = ch.indexOfSymbol()
-            result += " " + index.applyKeys(keys)
-        }
-        return result
-    }
-
-    fun encode(m: String): String {
-        evaluateParts()
-        printParams()
-        return m.toCharArray().applyKeysForMessage(keys = publicKeys)
-    }
-
-    fun decode(m: String): String {
-        evaluateParts()
-        return m.toCharArray().applyKeysForMessage(keys = privateKeys)
     }
 }
