@@ -10,7 +10,7 @@ fun main() {
     val k1 = "3 1 2 5 4"
     val k2 = "4 5 2 1 3"
     val cryptographer = MatrixCryptographer(
-        "3 1 2 5 4".readKeys(),
+        k1.readKeys(),
         k2.readKeys()
     )
     val encoded = cryptographer.encode(str)
