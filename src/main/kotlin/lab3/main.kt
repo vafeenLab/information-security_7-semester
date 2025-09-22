@@ -8,7 +8,7 @@ package lab3
 * а также вычисляемые параметры.
 *
 * p=7	q=13	open msg=ALPHA
- */
+*/
 
 fun main() {
     val rsa = RSA(p = 7, q = 13)
