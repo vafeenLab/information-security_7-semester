@@ -2,11 +2,54 @@ package lab6
 
 import lab6.file.FileImportance
 
+/**
+ * Интерфейс System определяет контракт для системы управления доступом.
+ * Он описывает основные операции по управлению пользователями, файлами
+ * и правами доступа.
+ */
 internal interface System {
-    fun addGuest(id: Int, name: String, password: String)
-    fun addUser(id: Int, name: String, password: String)
-    fun addAdmin(id: Int, name: String, password: String)
+    /**
+     * Добавляет гостя в систему.
+     * @param id Уникальный идентификатор гостя.
+     * @param name Имя гостя.
+     */
+    fun addGuest(id: Int, name: String)
+
+    /**
+     * Добавляет обычного пользователя в систему.
+     * @param id Уникальный идентификатор пользователя.
+     * @param name Имя пользователя.
+     */
+    fun addUser(id: Int, name: String)
+
+    /**
+     * Добавляет администратора в систему.
+     * @param id Уникальный идентификатор администратора.
+     * @param name Имя администратора.
+     */
+    fun addAdmin(id: Int, name: String)
+
+    /**
+     * Добавляет файл в систему.
+     * @param name Имя файла.
+     * @param importance Важность файла (см. [FileImportance]), влияющая на права доступа по умолчанию.
+     */
     fun addFile(name: String, importance: FileImportance)
+
+    /**
+     * Возвращает строковое представление текущей матрицы (таблицы) доступа.
+     * Это представление должно наглядно отображать права каждого пользователя на каждый файл.
+     * @return Строка, содержащая отформатированную таблицу доступа.
+     */
     fun tableToString(): String
+
+    /**
+     * Осуществляет передачу прав доступа на файл от одного пользователя (отправителя)
+     * другому пользователю (получателю).
+     * @param senderId ID пользователя, который делится правами.
+     * @param recipientId ID пользователя, которому предоставляются права.
+     * @param filename Имя файла, на который передаются права.
+     * @param access Конкретное право доступа (см. [Access]), которое передается.
+     */
     fun shareRights(senderId: Int, recipientId: Int, filename: String, access: Access)
 }
