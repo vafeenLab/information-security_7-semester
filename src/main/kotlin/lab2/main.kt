@@ -7,6 +7,8 @@ package lab2
 fun main() {
     val key = "ALPHA"//"LEMON"
     val text = "SHIFROVANIE"
+    println("key=$key")
+    println("text=$text")
     val encoded = Wigener(key).encode(text)
-    println(encoded)
+    println("encoded text=$encoded")
 }

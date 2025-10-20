@@ -35,7 +35,7 @@ fun main() {
     // Пример неуспешной операции: Гость (id=2) пытается поделиться правом на запись (Write)
     // на файл fileName1 с Администратором (id=0).
     // Гость не имеет права на передачу (Share).
-    // pc.shareRights(2, 0, fileName1, Access.Write) // операция будет неуспешна
+     pc.shareRights(2, 0, fileName1, Access.Write) // операция будет неуспешна
 
     // Выводим состояние таблицы доступа после передачи прав
     pc.tableToString().also { println(it) }

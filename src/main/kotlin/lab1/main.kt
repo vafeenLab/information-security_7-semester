@@ -14,6 +14,8 @@ fun main() {
         k2.readKeys()
     )
     val encoded = cryptographer.encode(str)
+    println("Закодированное")
     println(encoded.toMatrixString())
+    println("Декодированное")
     println(cryptographer.decode(encoded).toMatrixString())
 }
